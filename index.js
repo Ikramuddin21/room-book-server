@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
-require('dotenv').config()
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -21,7 +21,7 @@ async function run () {
         const servicesCollection = database.collection('services');
         const galleryCollection = database.collection('gallery');
         const usersCollection = database.collection('users');
-
+        
         // get services api
         app.get('/services', async (req, res) => {
             const services = servicesCollection.find({});
@@ -51,18 +51,34 @@ async function run () {
             res.json(result);
         });
 
-        // post api
+        // post user api
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user);
             res.json(result);
         });
 
+        // post services api
+        app.post('/services', async (req, res) => {
+            const service = req.body;
+            const result = await servicesCollection.insertOne(service);
+            console.log('add service', result);
+            res.json(result);
+        })
+
         // delete single item api
         app.delete('/users/:id', async (req, res) => {
             const id = req.params.id;
             const query = {serviceId: id};
             const result = await usersCollection.deleteOne(query);
+            res.json(result);
+        });
+        
+        // delete user multiple service
+        app.delete('/users', async (req, res) => {
+            const email = req.query.email;
+            const queryEmail = {email: email};
+            const result = await usersCollection.deleteMany(queryEmail);
             res.json(result);
         })
     }
